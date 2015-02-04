@@ -349,6 +349,10 @@ void ShoutStart(int which) {
 }
 
 // *************************** PROJECT 2 TASK 1 START ***************************
+// global variables
+char c[INPUT_SIZE];
+char *numSticks = c;
+
 /**
  * Function: promptDP1(char*&,char*&)
  * Description: Prompts the user to enter two integer values: one for the amount of
