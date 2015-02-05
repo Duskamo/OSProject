@@ -349,6 +349,8 @@ void ShoutStart(int which) {
 }
 
 // *************************** PROJECT 2 TASK 1 START ***************************
+int pNum = 0;
+
 /**
  * Function: promptDP1(char*&,char*&)
  * Description: Prompts the user to enter two integer values: one for the amount of
@@ -365,21 +367,37 @@ void promptDP1(char *&philNum, char *&mealNum) {
 	scanf("%s",mealNum);
 }
 
+/**
+ * Function: sit(int)
+ * Description: Implements the DP algorithm.
+ */
 void sit(int pNum) {
 	printf("Philosopher %i is now sitting.",pNum);
 	printf("\n");
 }
 
+/**
+ * Function: pickupChopstick(int,char*)
+ * Description: 
+ */
 void pickupChopstick(int pNum, char* which) {
 	printf("Philosopher %i has picked up the %s chopstick.",pNum,which);
 	printf("\n");
 }
 
+/**
+ * Function: eat(int)
+ * Description: 
+ */
 void eat(int pNum) {
 	printf("Philosopher %i is now eating.",pNum);
 	printf("\n");
 }
 
+/**
+ * Function: prevention(int,char*)
+ * Description: 
+ */
 void prevention(int pNum, char* which) {
 	int randWait = 0;
 	
@@ -389,18 +407,33 @@ void prevention(int pNum, char* which) {
 	for (int j = 0; j < randWait; j++) {
 		printf("Philiosopher %i is %s.",pNum,which);
 		printf("\n");
-		printf("%i",randWait);
 	}
 }
 
+/**
+ * Function: putdownChopstick(int,char*)
+ * Description: 
+ */
 void putdownChopstick(int pNum, char* which) {
 	printf("Philosopher %i has put down the %s chopstick.",pNum,which);
 	printf("\n");
 }
 
+/**
+ * Function: think(int)
+ * Description: 
+ */
 void think(int pNum) {
 	printf("Philosoper %i has started thinking.");
 	printf("\n");
+}
+
+/**
+ * Function: leave()
+ * Description: Implements the DP algorithm.
+ */
+void leave() {
+
 }
 
 /**
@@ -408,16 +441,21 @@ void think(int pNum) {
  * Description: Implements the DP algorithm.
  */
 void DiningPhilosophers(int which) {
-	sit(which);
-	pickupChopstick(which,"left");
-	pickupChopstick(which,"right");
-	eat(which);
-	prevention(which,"eating");
-	putdownChopstick(which,"left");
-	putdownChopstick(which,"right");
-	think(which);
-	prevention(which,"thinking");
-	currentThread->Yield();
+	bool chopNum[pNum];
+	if (true) {
+		sit(which);
+		pickupChopstick(which,"left");
+		pickupChopstick(which,"right");
+		eat(which);
+		synchronization(which,"eating");
+		putdownChopstick(which,"left");
+		putdownChopstick(which,"right");
+		think(which);
+		synchronization(which,"thinking");
+		currentThread->Yield();
+	} else {
+		leave();
+	}
 }
 
 /**
@@ -433,6 +471,7 @@ void DiningStart(int which) {
 
 	promptDP1(philNum,mealNum);
 	validation(philNum,mealNum,'i');
+	pNum = atoi(philNum);
 	createThreads(atoi(philNum),DiningPhilosophers);
 }
 
