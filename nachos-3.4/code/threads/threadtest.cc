@@ -365,12 +365,58 @@ void promptDP1(char *&philNum, char *&mealNum) {
 	scanf("%s",mealNum);
 }
 
+void sit(int pNum) {
+	printf("Philosopher %i is now sitting.",pNum);
+	printf("\n");
+}
+
+void pickupChopstick(int pNum, char* which) {
+	printf("Philosopher %i has picked up the %s chopstick.",pNum,which);
+	printf("\n");
+}
+
+void eat(int pNum) {
+	printf("Philosopher %i is now eating.",pNum);
+	printf("\n");
+}
+
+void prevention(int pNum, char* which) {
+	int randWait = 0;
+	
+	RandomInit(pNum); 	
+	randWait = ((Random() % 5) + 2);
+	
+	for (int j = 0; j < randWait; j++) {
+		printf("Philiosopher %i is %s.",pNum,which);
+		printf("\n");
+	}
+}
+
+void putdownChopstick(int pNum, char* which) {
+	printf("Philosopher %i has put down the %s chopstick.",pNum,which);
+	printf("\n");
+}
+
+void think(int pNum) {
+	printf("Philosoper %i has started thinking.");
+	printf("\n");
+}
+
 /**
  * Function: DiningPhilosophers(int)
  * Description: Implements the DP algorithm.
  */
 void DiningPhilosophers(int which) {
-	
+	sit(which);
+	pickupChopstick(which,"left");
+	pickupChopstick(which,"right");
+	eat(which);
+	prevention(which,"eating");
+	putdownChopstick(which,"left");
+	putdownChopstick(which,"right");
+	think(which);
+	prevention(which,"thinking");
+	currentThread->Yield();
 }
 
 /**
