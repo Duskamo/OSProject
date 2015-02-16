@@ -18,19 +18,10 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
-// Begin code changes by Conner Chaney
-// Creates global boolean variables in order to communicate the options selected			
-bool option1Flag = false, option2Flag(false), errorFlag(false);
-//begin changes by Edwin Brown
-bool option3Flag = false, option4Flag(false), option5Flag(false), option6Flag(false);	
-//end changes by Edwin Brown
-/*
-Can call functions in threadtest.cc from this file using the below code. This is
-not necessary though.
-*/
-//extern void CreateShoutingThreads();
-//extern void CreateInputRecognition();
-// End code changes by Conner Chaney
+// begin change Gregory
+char *assignmentChoice;			// Option for -A commands
+bool assignmentCommand;			// Check if -A command is used
+// end change Gregory
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -105,9 +96,18 @@ Initialize(int argc, char **argv)
     int netname = 0;		// UNIX socket name
 #endif
     
+
+//change by Gregory Ledet
+	assignmentCommand = FALSE;
+
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
 	argCount = 1;
-	if (!strcmp(*argv, "-d")) {
+	if(!strcmp(*argv, "-A")){  // check for -A command
+            assignmentCommand = TRUE;          // set -A flag if -A command is used
+            assignmentChoice = *(argv + 1); // Store the parameter of -A command
+        }
+//end changes by Gregory Ledet
+        else if (!strcmp(*argv, "-d")) { // changed to else if
 	    if (argc == 1)
 		debugArgs = "+";	// turn on all debug flags
 	    else {
@@ -120,61 +120,7 @@ Initialize(int argc, char **argv)
 						// number generator
 	    randomYield = TRUE;
 	    argCount = 2;
-	
 	}
-// Begin code changes by Conner Chaney
-	// If the current argument is "-A" do the following
-	else if (!strcmp(*argv, "-A")) {
-            //ASSERT(argc > 1);
-	    // If the argument count is not greater than one then it is an
-	    // erroneous argument
-	    if (argc > 1) {
-                // If a 1 accompanies the -A argument then set option1Flag to
-                // true and argCount to 2.
-		if (!strcmp(*(argv + 1), "1")) {
-		    option1Flag = true;
-		    argCount = 2;
-		}
-		// If a 2 accompanies the -A argument then set option2Flag to
-                // true and argCount to 2.
-		else if (!strcmp(*(argv + 1), "2")) {
-		    option2Flag = true;
-		    argCount = 2;
-		}
-//begin changes made by Edwin Brown
-		else if (!strcmp(*(argv + 1), "3")) {
-		    option3Flag = true;
-		    argCount = 2;
-		}
-		else if (!strcmp(*(argv + 1), "4")) {
-		    option4Flag = true;
-		    argCount = 2;
-		}
-		else if (!strcmp(*(argv + 1), "5")) {
-		    option5Flag = true;
-		    argCount = 2;
-		}
-		else if (!strcmp(*(argv + 1), "6")) {
-		    option6Flag = true;
-		    argCount = 2;
-		}
-//end changes made by Edwin Brown
-		// Otherwise whatever accompanies the -A argument is not valid.
-		// Therefore, set errorFlag to true and argCount to 2.
-		else {
-		    errorFlag = true;
-                    argCount = 2;
-		}
-	    }
-	    // If there is no argument accompanying the -A argument. Then set
-	    // errorFlag to true and argCount to 1.
-	    else {
-                errorFlag = true;
-		argCount = 1;
-	    }
-	} 
-// End code changes by Conner Chaney
-
 #ifdef USER_PROGRAM
 	if (!strcmp(*argv, "-s"))
 	    debugUserProg = TRUE;
