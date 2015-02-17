@@ -368,6 +368,9 @@ void MainDPWLoop(int ps) {
 printf("Philosopher %d picked up left chopstick %d \n", id, (chopptr [Lchop])->chopid);	
 			chopptr [Lchop]->chopflag =0;
 			}
+		////////////////
+		//currentThread->Yield(); -------- yield between pickups
+		////////////////
 //cannot proceed to pickup right chopstick if left experienced deadlock
 		if ((option4Flag == true) && (chopptr [Lchop]->Deadlock <10)) {
 			
