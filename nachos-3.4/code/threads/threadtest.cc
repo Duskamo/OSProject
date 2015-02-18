@@ -322,6 +322,10 @@ const char shout9[] = "Get Over Here!!!\n";
 // Create external boolean variables that were set in the file system.cc
 extern bool option1Flag, option2Flag, option3Flag, option4Flag, option5Flag, option6Flag, errorFlag;
 
+//edit code by Gregory Ledet
+bool semiphoreFlag;
+//end code editing by Gregory Ledet
+
 // Boolean variable that makes one thread wait if both options are selected
 // For example, if the command was ./nachos -A 1 -rs 234 -A 2, then one option's
 // thread will yield until finishedFlag is set to true.
@@ -346,13 +350,15 @@ void MainDPWLoop(int ps) {
 	printf("Philosopher %d takes meal %d \n", id, TotMeals);
 //when a meal is taken TotMeals is incremented.
 	TotMeals++;
-//option4Flag indicates that semaphores are to be used
-	if (option4Flag == true) {
+	
+//begin code editing by Gregory Ledet	
+//semiphoreFlag indicates that semaphores are to be used
+	if (semiphoreFlag == true) {
 		semptr [Lchop]->P();
 		};
 	chopptr [Lchop]->Deadlock == 0;
-//option3Flag indicates that busy/wait is to be used
-	if (option3Flag == true) {
+//semiphoreFlag indicates that busy/wait is to be used
+	if (semiphoreFlag == false) {
 		while (chopptr [Lchop]->chopflag == 0) {
 		   printf(" Philosopher %d is waiting on left %d\n", id, (chopptr [Lchop])->chopid);
 		   chopptr [Lchop]->Deadlock++;
@@ -372,7 +378,7 @@ printf("Philosopher %d picked up left chopstick %d \n", id, (chopptr [Lchop])->c
 		//currentThread->Yield(); -------- yield between pickups
 		////////////////
 //cannot proceed to pickup right chopstick if left experienced deadlock
-		if ((option4Flag == true) && (chopptr [Lchop]->Deadlock <10)) {
+		if ((semiphoreFlag == true) && (chopptr [Lchop]->Deadlock <10)) {
 			
 				semptr [Rchop]->P();	
 				};
@@ -380,7 +386,7 @@ printf("Philosopher %d picked up left chopstick %d \n", id, (chopptr [Lchop])->c
 				};
 		(chopptr [Lchop])->chopflag = 0;
 //cannot proceed to pickup right chopstick if left experienced deadlock
-		if ((option3Flag == true) && (chopptr [Lchop]->Deadlock == 0)) {		
+		if ((semiphoreFlag == false) && (chopptr [Lchop]->Deadlock == 0)) {		
 		while ((chopptr [Rchop])->chopflag == 0) {
 		   printf(" Philosopher %d is waiting on right %d\n", id, (chopptr [Rchop])->chopid); 
 		   chopptr [Rchop]->Deadlock++;
@@ -409,19 +415,19 @@ printf("Philosopher %d picked up left chopstick %d \n", id, (chopptr [Lchop])->c
 				currentThread->Yield();
 					};
 				printf("Philosopher %d putdown left chopstick %d \n", id, (chopptr [Lchop])->chopid);
-				if (option4Flag == true) {	
+				if (semiphoreFlag == true) {	
 					semptr [Lchop]->V();
 					};
-				if (option3Flag == true) {  
+				if (semiphoreFlag == false) {  
 					(chopptr [Lchop])->chopflag++;
 					};
 				printf("Philosopher %d putdown right chopstick %d \n", id, (chopptr [Rchop])->chopid);
 
 
-				if (option4Flag == true) {	
+				if (semiphoreFlag == true) {	
 					semptr [Rchop]->V();
 					};
-				if (option3Flag == true) {  
+				if (semiphoreFlag == false) {  
 					(chopptr [Rchop])->chopflag++;
 					};
 				((Person*) ps)->MealCounter++;
@@ -635,9 +641,9 @@ void shoutOut(int numAndTimes) {
 // dummy variable that is not used, but only exists in order to fork a thread to
 // this function.
 void CreateShoutingThreads(int x) {
-	while (!finishedFlag) {
-		currentThread->Yield();
-	}
+	//while (!finishedFlag) {
+	//	currentThread->Yield();
+	//}
 	int threadNum;
 	int shoutNum;
 	threadStruct *ts;
@@ -687,11 +693,54 @@ void
 ThreadTest()
 {
     DEBUG('t', "Entering ThreadTest");
+	
 // Begin code changes by Conner Chaney
+//Begin code editing by Gregory Ledet
+	//create a new thread
+	Thread *t = new Thread("forked thread");
+	//allow selection if errorflag is false
+	if (!errorFlag) {
+		//The selection is chosen using IF statments based on the what
+		// *assignmentChoice is assigned in system.cc using the pointer
+		// (argv + 1) to identify the task. The semiphoreFlag is used to
+		// determine if the function DiningPhilMain uses the semiphore
+		// method or not.
+		if (*assignmentChoice == '1'){
+    		t->Fork(CreateShoutingThreads, 0);
+    	}
+		else if (*assignmentChoice == '2') {
+			t->Fork(InputThread, 0);
+		}
+		else if (*assignmentChoice == '3') {
+			semiphoreFlag = false;
+			t->Fork(DiningPhilMain, 0);
+		}
+		else if (*assignmentChoice == '4') {
+			semiphoreFlag = true;
+			t->Fork(DiningPhilMain, 0);
+		}
+		//Insert Mailbox Office Selection
+/*		else if (*assignmentChoice == '5') {
+			semiphoreFlag = true;
+			t->Fork(, 0);
+		}
+		else if (*assignmentChoice == '6') {
+			semiphoreFlag = true;
+			t->Fork(, 0);
+		}
+*/		
+	}
+	else
+    	printf("\nErroneous Command Line Argument!\n\n"); 
+
+	currentThread->Finish();
+//end code editing by Gregory Ledet
+
+
     // Execute the following code only if the errorFlag has not been set. If the
     // errorFlag variable has been set to true then output an error message and
     // exit gracefully.
-    if (!errorFlag) {
+   /* if (!errorFlag) {
         // If the command was entered twice with both options selected then fork
         // a thread to CreateShoutingThreads function and fork another thread to
         // CreateInputRecognition. In this case the CreateShoutingThreads thread
@@ -758,5 +807,5 @@ ThreadTest()
 
     t->Fork(SimpleThread, 1);
     SimpleThread(0);
+	*/
 }
-

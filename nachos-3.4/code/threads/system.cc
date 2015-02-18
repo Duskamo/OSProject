@@ -24,7 +24,12 @@ bool option1Flag = false, option2Flag(false), errorFlag(false);
 //begin changes by Edwin Brown
 bool option3Flag = false, option4Flag(false), option5Flag(false), option6Flag(false);	
 //end changes by Edwin Brown
+
+//begin change by Gregory Ledet
+char *assignmentChoice;
+//end changes by gregory Ledet
 /*
+
 Can call functions in threadtest.cc from this file using the below code. This is
 not necessary though.
 */
@@ -107,6 +112,17 @@ Initialize(int argc, char **argv)
     
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
 	argCount = 1;
+//Begin code editing by Gregory Ledet
+	if (!strcmp(*argv, "-A")) {
+	assignmentChoice = *(argv + 1);
+			errorFlag = false;
+			argCount = 2;
+	}
+	else {
+                errorFlag = true;
+		argCount = 1;
+	    }
+//End code editing by Gregory Ledet
 	if (!strcmp(*argv, "-d")) {
 	    if (argc == 1)
 		debugArgs = "+";	// turn on all debug flags
@@ -123,15 +139,23 @@ Initialize(int argc, char **argv)
 	
 	}
 // Begin code changes by Conner Chaney
+//Begin code editing by Gregory Ledet
+
 	// If the current argument is "-A" do the following
-	else if (!strcmp(*argv, "-A")) {
+	//else if (!strcmp(*argv, "-A")) {
             //ASSERT(argc > 1);
 	    // If the argument count is not greater than one then it is an
 	    // erroneous argument
-	    if (argc > 1) {
+	    //if (argc > 1) {
+			//assignmentChoice = *(argv + 1);
+			//errorFlag = false;
+			//argCount = 2;
+		//	}
+
+//end code editing by Gregory Ledet
                 // If a 1 accompanies the -A argument then set option1Flag to
                 // true and argCount to 2.
-		if (!strcmp(*(argv + 1), "1")) {
+/*		if (!strcmp(*(argv + 1), "1")) {
 		    option1Flag = true;
 		    argCount = 2;
 		}
@@ -159,20 +183,19 @@ Initialize(int argc, char **argv)
 		    argCount = 2;
 		}
 //end changes made by Edwin Brown
+*/
+
 		// Otherwise whatever accompanies the -A argument is not valid.
 		// Therefore, set errorFlag to true and argCount to 2.
-		else {
-		    errorFlag = true;
-                    argCount = 2;
-		}
-	    }
+	//	else {
+	//	    errorFlag = true;
+        //            argCount = 2;
+	//	}
+	  //  }
 	    // If there is no argument accompanying the -A argument. Then set
 	    // errorFlag to true and argCount to 1.
-	    else {
-                errorFlag = true;
-		argCount = 1;
-	    }
-	} 
+	    
+	 
 // End code changes by Conner Chaney
 
 #ifdef USER_PROGRAM
