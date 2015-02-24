@@ -12,7 +12,6 @@
 #include "copyright.h"
 #include "system.h"
 #include "stdio.h"
-#include "synch.h"
 
 //----------------------------------------------------------------------
 // SimpleThread
@@ -22,8 +21,7 @@
 //	"which" is simply a number identifying the thread, for debugging
 //	purposes.
 //----------------------------------------------------------------------
-//void P();
-//void V();
+
 void
 SimpleThread(int which)
 {
@@ -34,266 +32,6 @@ SimpleThread(int which)
         currentThread->Yield();
     }
 }
-
-
-// *************************** PROJECT 1 TASK 1 START ***************************
-// ---------------------------Dustin Landry Start -----------------------------
-
-// global variable
-const int INPUT_SIZE = 30;
-
-/**
- * Function: promptCheck()
- * Description: Function to prompt the user for some input.
- */
-char* promptCheck() {
-	char input1[INPUT_SIZE];
-	char *input = input1;
-
-	// prompt user for input
-	printf("Enter arbitrary input:");
-	printf("\n");
-	scanf("%s",input);
-	
-	return strdup(input);
-}
-
-/**
- * Function: display(char*,char)
- * Description: Function to display the input type given an input and the quantified type.
- */
-void display(char *input, char type) {
-	if (type == 'i') {
-		printf("%s is an integer.",input);
-	} else if (type == 'd') {
-		printf("%s is a decimal.",input);
-	} else if (type == 'n') {
-		printf("%s is a negative.",input);
-	} else if (type == 'c') {
-		printf("%s is a character string.", input);
-	} else if (type == 'b') {
-		printf("%s is a negative decimal.", input);
-	} else {
-		printf("Invalid input.");
-	}
-	printf("\n\n");
-}
-
-/**
- * Function: identification(char*)
- * Description: function that accepts a char pointer as input and returns the input type.
- */
-char identification(char* input) {
-	// start identifying input
-	char type = ' ';
-	int count = 0;	
-	int nCount = 0;	
-	int dCount = 0;
-
-	for (int i = 0; i < strlen(input); i++) { 
-		if (*(input + i) == '0' || *(input + i) == '1' || *(input + i) == '2' || *(input + i) == '3' || *(input + i) == '4' || *(input + i) == '5' || *(input + i) == '6' || *(input + i) == '7' || *(input + i) == '8' || *(input + i) == '9' || *(input + i) == '-' || *(input + i) == '.') { 
-			count++;
-
-			if (*(input + i) == '.') {
-				//count++;
-				dCount++;
-			}
-
-			if (*(input + 0) == '-') {
-				//count++;
-				nCount++;
-			}
-
-			if (*(input + 0) == '.') {
-				count = count + 10000;
-			}
-		} 
-	}
-
-	if (count == strlen(input)) {
-		type = 'i';
-
-		if (nCount > 0) 
-			type = 'n';
-		if (dCount > 0)
-			type = 'd'; 
-		if (*(input + strlen(input)-1) == '.') 
-			type = 'c';
-		if (nCount > 0 && dCount > 0)
-			type = 'b';
-		if (*(input + 1) == '.') 
-			type = 'c';
-
-	} else if (count > strlen(input)) {
-		if (*(input + 0) == '-') {
-			type = 'n';
-		} else if (*(input + 0) == '.') {
-			type = 'c';
-		} else {
-			type = 'd';
-		}
-
-		if (nCount > 0 && dCount > 0)
-			type = 'b';
-	} else {
-		type = 'c';
-	}
-
-	return type;
-}
-
-/**
- * Function: tests()
- * Description: Function to test several different types of input. 
- */
-void tests() {
-	char *input = "1123214";
-	char type = ' ';
-	
-	type = identification(input);
-	display(input,type);
-
-	input = "-124414";
-	type = identification(input);
-	display(input,type);
-
-	input = "yo";
-	type = identification(input);
-	display(input,type);
-
-	input = "yo124";
-	type = identification(input);
-	display(input,type);
-
-	input = "12yo";
-	type = identification(input);
-	display(input,type);
-
-	input = "-1232.123";
-	type = identification(input);
-	display(input,type);
-
-	input = "1232.123";
-	type = identification(input);
-	display(input,type);
-
-	input = "1232.123a";
-	type = identification(input);
-	display(input,type);
-
-	input = "-1232.123a";
-	type = identification(input);
-	display(input,type);	
-
-	input = "a1232.123";
-	type = identification(input);
-	display(input,type);
-
-	input = "-a1232.123";
-	type = identification(input);
-	display(input,type);
-
-	input = ".324";
-	type = identification(input);
-	display(input,type);
-
-	input = "42334.";		
-	type = identification(input);
-	display(input,type);
-
-	input = " 34fef";
-	type = identification(input);
-	display(input,type);
-
-	input = "-.34324";		
-	type = identification(input);
-	display(input,type);
-
-	input = " -1232.123";
-	type = identification(input);
-	display(input,type);
-
-	printf("\n");	
-}
-
-/**
- * Function: InputThread(int)
- * Description: Called by ThreadTest. Prompts the user for input, identifies the input,
-		and displays the input.
- */
-void InputThread(int which) {
-	currentThread->Yield();
-
-	char *input = 0;
-	char type = ' ';	
-	
-	input = promptCheck();
-	type = identification(input);
-	display(input,type);
-	
-	//tests();
-}
-
-/**
- * Function: validation(char*,char*)
- * Description: validates that the two values inputted by the user are both positive integer 			values.
- */
-void validation(char *tNum, char *sNum, char inType) {
-	char type1 = ' ';
-	char type2 = ' ';
-
-	type1 = identification(tNum); 
-	type2 = identification(sNum); 
-	
-	if (type1 != inType || type2 != inType) {
-		printf("Input doesnt match. Rerun program with positive integer values.\n\n");
-		currentThread->Finish();
-	} 
-}
-// ---------------------------Dustin Landry End ----------------------------- 
-
-// Begin code changes by Edwin Browm
-
-// Create structs for option 3 and option 4 the Person struct is for individual philosophers. The Chopstick struct is for individual chopsticks
-struct Person {
-	int PersonID;
-	int RightChop;
-	int LeftChop;
-	int MealCounter;
-	};
-struct Chopstick {
-	int chopid;
-//Deadlock is a couter used to monitor possible deadlock situation and chopflag monitors whether or not a chopstick is locked. Both are used in option 3
-	int Deadlock;
-	int chopflag;
-	};
-//chopptr is a pointer to the base address of Chopstick and is indexed as an array.
-Chopstick **chopptr;
-	
-
-// Semaphore {
-//	public:
-//	Semaphore (char* debugName, int initialValue);
-//	~Semaphore();
-//	char* getName() {return name;}
-//	void P();
- //       void V();
-//private:
-//	char* name;
-//	int value;
-//	List*queue;
-//};
-
-//semptr is the base address of the semaphore array and can be indexed as an array
-Semaphore **semptr;
-
-Person *ps;
-Chopstick *cs;
-
-int i, NumPhil, NumMeals;
-int NumBox, BoxSize, TotMsg;
-int TotMeals=0, mealseaten=0;
-int s=1;
 
 // Begin code changes by Conner Chaney
 
@@ -320,7 +58,7 @@ const char shout8[] = "Fatality\n";
 const char shout9[] = "Get Over Here!!!\n";
 
 // Create external boolean variables that were set in the file system.cc
-extern bool option1Flag, option2Flag, option3Flag, option4Flag, option5Flag, option6Flag, errorFlag;
+extern bool option1Flag, option2Flag, errorFlag;
 
 // Boolean variable that makes one thread wait if both options are selected
 // For example, if the command was ./nachos -A 1 -rs 234 -A 2, then one option's
@@ -329,253 +67,12 @@ bool finishedFlag = false;
 
 // Function that threads are forked to which makes them shout. The parameter
 // numAndTimes is meant to hold the address of a threadStruct pointer.
-
-//This is the main function of option 3 and 4
-void MainDPWLoop(int ps) {
-    int a, id;
-    int Lchop, Rchop;
-//this will loop while meals are remaining
-    while (TotMeals < NumMeals) { 
-	
-	id = (((Person*) ps)->PersonID);
-
-	Lchop = (((Person*) ps)->LeftChop);
-
-	Rchop = (((Person*) ps)->RightChop);
-	printf("Philosopher %d entered the room \n", id);
-	printf("Philosopher %d takes meal %d \n", id, TotMeals);
-//when a meal is taken TotMeals is incremented.
-	TotMeals++;
-//option4Flag indicates that semaphores are to be used
-	if (option4Flag == true) {
-		semptr [Lchop]->P();
-		};
-	chopptr [Lchop]->Deadlock == 0;
-//option3Flag indicates that busy/wait is to be used
-	if (option3Flag == true) {
-		while (chopptr [Lchop]->chopflag == 0) {
-		   printf(" Philosopher %d is waiting on left %d\n", id, (chopptr [Lchop])->chopid);
-		   chopptr [Lchop]->Deadlock++;
-		 
-		   if (((chopptr [Lchop])->Deadlock) > 10) {
-			break;};
-              	   currentThread->Yield();
-	 			};
-		   if (((chopptr [Lchop])->Deadlock) > 10) {
-			printf("DEADLOCK on left broken for Philosopher $d\n", id);
-		 	};
-		if (chopptr [Lchop]->Deadlock < 10) {	
-printf("Philosopher %d picked up left chopstick %d \n", id, (chopptr [Lchop])->chopid);	
-			chopptr [Lchop]->chopflag =0;
-			}
-		////////////////
-		//currentThread->Yield(); -------- yield between pickups
-		////////////////
-//cannot proceed to pickup right chopstick if left experienced deadlock
-		if ((option4Flag == true) && (chopptr [Lchop]->Deadlock <10)) {
-			
-				semptr [Rchop]->P();	
-				};
-			chopptr [Rchop]->Deadlock = 0;
-				};
-		(chopptr [Lchop])->chopflag = 0;
-//cannot proceed to pickup right chopstick if left experienced deadlock
-		if ((option3Flag == true) && (chopptr [Lchop]->Deadlock == 0)) {		
-		while ((chopptr [Rchop])->chopflag == 0) {
-		   printf(" Philosopher %d is waiting on right %d\n", id, (chopptr [Rchop])->chopid); 
-		   chopptr [Rchop]->Deadlock++;
-		   if (((chopptr [Rchop])->Deadlock) > 10) {
-			break;};
-              	   currentThread->Yield();
-		   	};
-			};
-//check to see if either chopstick experienced Deadlock		   
-		if (chopptr [Rchop]->Deadlock > 10 || chopptr [Lchop]-> Deadlock > 10)  {
-
-			printf("DEADLOCK on right broken for Philosopher %d\n", id);
-//decrement meals eaten counter as part of roll back
-			TotMeals--;
-			chopptr [Lchop]->chopflag++;
-			chopptr [Rchop]->chopflag++;
-			currentThread->Yield();
-			}
-		
-		else {(chopptr [Rchop])->chopflag--;
-			printf("Philosopher %d picked up right chopstick %d \n", id, (chopptr [Rchop])->chopid); 
-			int select = Random() % 9 + 1;
-
-			 while (select > 0) {
-				select--;
-				currentThread->Yield();
-					};
-				printf("Philosopher %d putdown left chopstick %d \n", id, (chopptr [Lchop])->chopid);
-				if (option4Flag == true) {	
-					semptr [Lchop]->V();
-					};
-				if (option3Flag == true) {  
-					(chopptr [Lchop])->chopflag++;
-					};
-				printf("Philosopher %d putdown right chopstick %d \n", id, (chopptr [Rchop])->chopid);
-
-
-				if (option4Flag == true) {	
-					semptr [Rchop]->V();
-					};
-				if (option3Flag == true) {  
-					(chopptr [Rchop])->chopflag++;
-					};
-				((Person*) ps)->MealCounter++;
-				mealseaten++;
-				};
-	chopptr [Rchop]->Deadlock = 0;
-	chopptr [Lchop]->Deadlock = 0;
-	printf("Philosopher %d left the room\n", id);	
-	};
-	
-	
-//printf("Philosopher %d ate %d meals.\n", id, ((Person*) ps)->MealCounter);
-//       printf("mealseaten %d\n", mealseaten);
-// Delete the threadStruct pointer by casting the integer address.
-	delete ((Person*) ps);
-	// Finish the current thread.
-	currentThread->Finish();
-
-};
-
-void DiningPhilMain(int x) {
-	int a = 0;
-
-	// dustin small edit start
-	char input1[30];
-	char input2[30];
-	char *philNum = input1;
-	char *mealNum = input2;
-	bool checks = false;	
-
-	do {
-		checks = false;
-	
-		printf("\nEnter the number of Philosophers:  ");
-		scanf("%s", philNum); 
-
-		printf("\nEnter total number of meals the Philosophers should eat:   ");
-		scanf("%s", mealNum);
-
-		validation(philNum,mealNum,'i');
-
-		NumPhil = atoi(philNum);
-		NumMeals = atoi(mealNum);
-
-		if (NumPhil <= 1 || NumPhil >= 1000000) {
-			printf ("\n Invalid input - more than 1000000 was entered\n \n ");
-			checks = true;
-		}	
-
-		if (NumMeals <= 0 || NumMeals >= 1000000) {
-			printf ("\n Invalid input - input exceeded 1000000  \n \n ");
-			checks = true;
-		} 
-		
-		if (NumMeals < NumPhil) {
-			printf ("\n Invalid input - input was smaller than the number of Philosophers. \n \n ");
-			checks = true;
-		}
-	} while	(checks);
-	// dustin small edit end
-
-	chopptr = new Chopstick *[NumPhil];
-	semptr = new Semaphore *[NumPhil];
-	for (i = 0; i < NumPhil; i++) {
-//		if (i == 0) 
-		Thread *p = new Thread("DPW");
-
-		ps = new Person;
-		ps->PersonID = (i); 
-		chopptr [i] = new Chopstick;
-		chopptr [i]->chopid = i;
-		chopptr [i]->chopflag = 1;
-	        semptr [i] = new Semaphore("chop", 1);
-	        
-		a = i+1;
-		ps->LeftChop = i;
-		ps->RightChop = a;
-		if (a == NumPhil) { 
-			ps->RightChop = 0;};
-		chopptr [i]->Deadlock = 0;
-		ps->MealCounter = 0;
-		p->Fork(MainDPWLoop, (int) ps);
-	        printf("Philosopher %d is ready to enter the room\n", i);
-		
-		};
-		
-		currentThread->Finish();
-};
-
-//void PostOffice(int x) {
-//
-//inputloop1:
-//	printf("\nEnter the number of Mailboxes:  ");
-//	scanf("%d", &NumBox); 
-//	if (NumPhil <= 1 || NumBox >= 1000000)
-//	    {printf ("\n Invalid input - more than 1000000 was entered\n \n ");
-//		goto inputloop1;}
-//inputloop3:
-//	printf("\nEnter size of the mailbox:   ");
-//	scanf("%d", &BoxSize); 
-//	if (BoxSize <= 0 || BoxSize >= 1000000)
-//	    {printf ("\n Invalid input - input exceeded 1000000  \n \n ");
-//		goto inputloop3;}
-//
-//inputloop4:
-//	printf("\nEnter total number of messages that should be read:   ");
-//	scanf("%d", &NumMsg); 
-//	if (NumMsg <= 0 || NumMsg >= 1000000)
-//	    {printf ("\n Invalid input - input exceeded 1000000  \n \n ");
-//		goto inputloop4;}
-//		else if (NumMsg < NumBox) 
-//		{printf ("\n Invalid input - input was smaller than the nu/umber of Mailboxes. \n \n ");
-//		goto inputloop4;}
-	
-//	for (i = 0; i < NumBoxes; i++) {
-//		if (option3Flag	== true) {
-//			chopflag [i] = 1;
-//		};
-//		if (option4Flag == true) {
-//			SemPointer [i] = new Semaphore("chop", 1);
-//		};
-//	};
-
-//	for (i = 0; i < NumPhil; i++) {
-//		Thread *p = new Thread("DPW");
-//
-//		ps = new Person;
-//		ps->PersonID = (i); 
-//		int a = i;
-//		a++;
-//		
-//		ps->RightChop = a;
-//		if (a == NumPhil)
-//			{ps->RightChop = 0;};
-//		ps->LeftChop = i;
-//		ps->Deadlock = 0;
-//		ps->MealCounter = 0;
-//		p->Fork(MainDPWLoop, (int) ps);
-//	        printf("Philosopher %d is ready to enter the room\n", i);};
-//		currentThread->Finish();
-//
-//};
-
-
 void shoutOut(int numAndTimes) {
-
-
-
 	// Loop until the thread has shouted the number of times stored in the
-	// threadStruct's integer data member shoNum.
+	// threadStruct's integer data member shouNum.
 	for (int i = 0; i < ((threadStruct*) numAndTimes)->shoutNum; i++) {
 		// Output the thread id stored in the threadStruct's member
 		// variable threadID.
-
 		printf("\nThread %d says ", ((threadStruct*) numAndTimes)->threadID);
 		
 		// Randomly select one of the 9 shouts by generating a random 
@@ -676,6 +173,233 @@ void CreateShoutingThreads(int x) {
 	
 }
 
+// Function used in input validation to detect if the user enters the empty
+// string and output the appropriate message. The finishedFlag variable is set
+// to true just in case the user selected to enter both options.
+void EmptyStringDetect() {
+	printf("\nEmpty character array detected.\n\n");
+	finishedFlag = true;
+}
+
+// Function used in input validation to detect if the user enters a character
+// array and output the appropriate message. The finishedFlag variable is set
+// to true just in case the user selected to enter both options.
+void CharacterDetected() {
+	printf("\nThe input was a character string\n\n");
+	finishedFlag = true;
+}
+
+// Funcion that is called if the first character entered by the user is '-'. It
+// will output wheteher or not the input is a negative integer, a negative
+// decimal, or a character string. The parameter is the address of a pointer to
+// a threadStruct2 variable. threadStruct2 contains the size of the array input
+// by the user and a deep copy of the chracter array itself.
+void DetectNegative(int ts) {
+	bool decCheck = false, charCheck = false, intCheck = true;
+	int i;
+	if (((threadStruct2*) ts)->arr[1] == '\0') {
+		CharacterDetected();
+		delete ((threadStruct2*) ts)->arr;
+		((threadStruct2*) ts)->arr = NULL;
+		delete (threadStruct2*) ts;
+		currentThread->Finish();
+	}
+	
+	for (i = 1; i < ((threadStruct2*) ts)->size; i++) {
+		if ((((threadStruct2*) ts)->arr[i] >= '0' &&
+		    ((threadStruct2*) ts)->arr[i] <= '9')
+		    || ((threadStruct2*) ts)->arr[i] == '.') {
+			if (((threadStruct2*) ts)->arr[i] == '.'){
+				decCheck = true;
+				intCheck = false;
+				i++;
+				break;
+			}
+			else
+				continue;
+		}
+		else {
+			charCheck = true;
+			intCheck = false;
+			CharacterDetected();
+			break;
+		}
+	}
+	if (decCheck == true && (((threadStruct2*)ts)->arr[i] >= '0'
+	    && ((threadStruct2*)ts)->arr[i] <= '9')) {
+		for (;i < ((threadStruct2*) ts)->size; i++) {
+			if (((threadStruct2*) ts)->arr[i] >= '0' 
+			&& ((threadStruct2*) ts)->arr[i] <= '9')
+				continue;
+			else {
+				charCheck = true;
+				CharacterDetected();
+				break;
+			}
+		}
+	}
+	else if (intCheck == false && charCheck != true) {
+		charCheck = true;
+		CharacterDetected();
+	}
+	if (decCheck == false && charCheck != true) {
+		printf("\nNegative integer detected.\n\n");
+		finishedFlag = true;
+	}
+	else if (decCheck == true && charCheck != true) {
+		printf("\nNegative decimal detected.\n\n");
+		finishedFlag = true;
+	}
+	delete ((threadStruct2*) ts)->arr;
+	((threadStruct2*) ts)->arr = NULL;
+	delete (threadStruct2*) ts;
+	currentThread->Finish();
+}
+
+// Funcion that is called if the first character entered by the user is a digit.
+// It will output wheteher or not the input is an integer, a decimal, or a
+// character string. The parameter is the address of a pointer to a
+// threadStruct2 variable. threadStruct2 contains the size of the array input by
+// the user and a deep copy of the chracter array itself.
+void DetectIntegerOrDecimal(int ts) {
+	bool decCheck = false, charCheck = false, intCheck = true;
+	int i;
+
+	for (i = 1; i < ((threadStruct2*) ts)->size; i++) {
+		if ((((threadStruct2*) ts)->arr[i] >= '0' &&
+		    ((threadStruct2*) ts)->arr[i] <= '9') ||
+		    ((threadStruct2*) ts)->arr[i] == '.') {
+			if (((threadStruct2*) ts)->arr[i] == '.'){
+				decCheck = true;
+				intCheck = false;
+				i++;
+				break;
+			}
+			else
+				continue;
+		}
+		else {
+			charCheck = true;
+			intCheck = false;
+			CharacterDetected();
+			break;
+		}
+	}
+	if (decCheck == true && (((threadStruct2*)ts)->arr[i] >= '0' &&
+	    ((threadStruct2*)ts)->arr[i] <= '9')) {
+		for (;i < ((threadStruct2*) ts)->size; i++) {
+			if (((threadStruct2*) ts)->arr[i] >= '0' &&
+			    ((threadStruct2*) ts)->arr[i] <= '9')
+				continue;
+			else {
+				charCheck = true;
+				CharacterDetected();
+				break;
+			}
+		}
+	}
+	else if (intCheck == false && charCheck != true) {
+		charCheck = true;
+		CharacterDetected();
+	}
+	if (decCheck == false && charCheck != true) {
+		printf("\nInteger detected.\n\n");
+		finishedFlag = true;
+	}
+	else if (decCheck == true && charCheck != true) {
+		printf("\nDecimal detected.\n\n");
+		finishedFlag = true;
+	}
+	delete ((threadStruct2*) ts)->arr;
+	((threadStruct2*) ts)->arr = NULL;
+	delete (threadStruct2*) ts;
+	currentThread->Finish();
+}
+
+// Function that accepts a string input by the user and stores it in a character
+// array.  If the first character input by the user is '-' then it forks a
+// thread to the DetectNegative function.  If the first character input by the
+// user is a digit then it forks a thread to the DetectIntegerOrDecimal
+// function.  If the user enters a character other than a digit or '-' then it
+// simply calls the CharacterDetected function in order to produce the correct
+// output. If the user does not enter any input then it call the
+// EmptyStringDetected function in order to generate the proper output. The
+// parameter is a dummy variable that is not used, but only exists in order to
+// fork a thread to this function.
+void CreateInputRecognition(int x) {
+	printf("\nIn CreateInputRecognition\n");
+	threadStruct2 *ts;
+	int maxLength = 4;
+	int curSize = 0;
+	
+	char *str = new char[maxLength];
+	char *temp;
+	curSize = maxLength;
+	int currSize;
+	int ch = EOF;
+	int i = 0;
+	
+	printf("Enter a string: ");
+	
+	if (str != NULL) {
+		while ((ch = getchar()) != '\n' && ch != EOF) {
+			//if ((char) ch != ' ') { // Add this to ignore leading whitespace
+				str[i++] = (char) ch;
+				if (i == curSize) {
+					currSize = curSize;
+					curSize = i + maxLength;
+					temp = new char[currSize];
+					for (int j = 0; j < currSize; j++) {
+						temp[j] = str[j];
+					}
+					delete str;
+					str = NULL;
+					str = new char[curSize];
+					for (int j = 0; j < currSize; j++) {
+						str[j] = temp[j];
+					}
+					delete temp;
+					temp = NULL;
+				
+				}
+			//} // Add this to ignore leading whitespace
+		}
+		
+		str[i] = '\0';
+		if (str[0] == '-') {
+			ts = new threadStruct2;
+			ts->size = i;
+			ts->arr = new char[curSize];
+			for (int k = 0; k < curSize; k++) {
+				ts->arr[k] = str[k];
+			}
+			
+			Thread *t = new Thread("shouting thread");
+			t->Fork(DetectNegative, (int) ts);
+		}
+		else if (str[0] >= '0' && str[0] <= '9') {
+			ts = new threadStruct2;
+			ts->size = i;
+			ts->arr = new char[curSize];
+			for (int k = 0; k < curSize; k++) {
+				ts->arr[k] = str[k];
+			}
+			
+			Thread *t = new Thread("shouting thread");
+			t->Fork(DetectIntegerOrDecimal, (int) ts);
+		}
+		else {
+			if (str[0] == '\0')
+				EmptyStringDetect();
+			else
+				CharacterDetected();
+		}
+	}
+	delete str;
+	str = NULL;
+	currentThread->Finish();
+}
+// End code changes made by Conner Chaney
 
 
 //----------------------------------------------------------------------
@@ -697,25 +421,6 @@ ThreadTest()
         // CreateInputRecognition. In this case the CreateShoutingThreads thread
         // will yield until the CreateInputRecognition thread is finished and
         // then it will execute.
-	if (option3Flag == true) {
-		Thread *t2 = new Thread("DPW");
-
-   		t2->Fork(DiningPhilMain, 0);
-
-		};
-	if (option4Flag == true) {
-		Thread *t2 = new Thread("DPW");
-
-   		t2->Fork(DiningPhilMain, 0);
-
-		};
-//	if (option5Flag == true) {
-//		Thread *t2 = new Thread("PostOffice");
-
-  // 		t2->Fork(PostOffice, 0);
-
-//		}
-//	
     	if (option1Flag == true && option2Flag == true) {
     		Thread *t = new Thread("forked thread1");
 
@@ -723,14 +428,14 @@ ThreadTest()
     
     		Thread *t2 = new Thread("forked thread2");
 
-    		t2->Fork(InputThread, 0);
+    		t2->Fork(CreateInputRecognition, 0);
     	}
     	// If option 1 was selected fork a thread to the CreateInputRecognition
     	// function.
     	else if (option1Flag == true && option2Flag == false) {
     		Thread *t2 = new Thread("forked thread2");
 
-    		t2->Fork(InputThread, 0);
+    		t2->Fork(CreateInputRecognition, 0);
     	}
     	// If option 2 was selected fork a thread to the CreateShoutingThreads
     	// function.
